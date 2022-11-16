@@ -444,11 +444,13 @@
             web3.eth.getCoinbase().then((result)=>{
                 if(result){
                     this.printUserInfo();
-                    this.getContract();
                 }else{
-                    // alert('please connect your wallet first')
+                    alert('please connect your wallet first')
                 }
             });
+
+            // 取得合約
+            this.getContract_V2();
 
         }
     
