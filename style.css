@@ -1,0 +1,116 @@
+
+
+*{
+    box-sizing: border-box;
+}
+
+html, body{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+}
+
+.top-area{
+    display: flex;
+    padding:0 35px;
+    align-items: center;
+    width: 100%;
+    height: 60px;
+    border: 1px solid rgb(240, 240, 240);
+    background-color: #fff;
+}
+
+.project-logo{
+    margin-right: auto;
+    font-family:'Times New Roman', Times, serif;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.fa-solid{
+    font-size: 25px;
+    color: #2064ea;
+}
+
+.eth-balance{
+    font-size: 20px;
+    padding: 0 50px;
+}
+
+.connect-btn{
+    padding: 5px 20px;
+    border: none;
+    border-radius: 70px;
+    box-shadow: 0 2px 5px 0px #121212;
+    background-color: #2064ea;
+    color: rgb(232, 232, 232);
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.main-area{
+    width: 100%;
+    height: 75vh;
+    background-color: rgba(166, 83, 83, 0.1);
+    overflow: auto;
+}
+
+.play-area{
+    height: 60px;
+    padding: 10px;
+}
+
+.mint-button{
+    padding: 5px 20px;
+    border: none;
+    border-radius: 50px;
+    box-shadow: 0 2px 5px 0px #121212;
+    background-color: #229969;
+    color: rgb(232, 232, 232);
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.nft-showcase{
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 5px;
+}
+
+.each-box{
+    display: flex;
+    width: 50%;
+    height: 150px;
+    margin-bottom: 10px;
+}
+
+.nft-photo{
+    flex:1;
+    border: 2px solid rgb(255, 255, 255);
+    border-radius: 10px;
+    background-position: center center;
+    background-size: cover;
+}
+
+.nft-content{
+    flex: 2;
+    padding: 10px;
+    font-family:'Times New Roman', Times, serif;
+}
+
+
+.nft-title{
+    font-weight: bold;
+    font-size: 16px;
+    color: #2064ea;
+}
+
+.nft-description{
+    color: rgb(240, 240, 240)
+}
+
+.footer{
+    padding:5px;
+}
