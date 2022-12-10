@@ -66,7 +66,7 @@ h1,h2,h3,h4,h5{
 
 .swift-box{
     position: absolute;
-    width: 500px;
+    width: 280px;
     height: 120px;
     padding: 5px 0;
     top: 108%;
@@ -92,8 +92,8 @@ h1,h2,h3,h4,h5{
 }
 
 .net-choice:hover{
-    /* color:rgb(200, 200, 200); */
-    background-color:rgb(200, 200, 200);
+    color:#229969;
+    /* background-color:rgb(200, 200, 200); */
     cursor: pointer;
 }
 
@@ -120,12 +120,13 @@ h1,h2,h3,h4,h5{
 }
 
 .play-area{
-    height: 60px;
-    padding: 10px 30px;
+    height: 50px;
+    padding: 10px 30px 5px 30px;
 }
 .game-description{
     padding: 10px 30px;
     /* background: rgba(11, 11, 11, 0.7); */
+    font-family: Verdana, Arial, Helvetica, sans-serif;
     color: #121212;
 }
 
@@ -237,4 +238,8 @@ h1,h2,h3,h4,h5{
 .close-modal:hover{
     color: rgb(255, 255, 255);
     background-color: red;
+}
+
+.mint-status{
+    color: red
 }

@@ -61,6 +61,7 @@
 						<li 
 							class="net-choice"
 							:class="{ activeChoice: chainId== 1 }"
+							@click="switchNet(1)"
 						>
 							<i class="fa-brands fa-ethereum"></i>
 							<span>Ethereum</span>
@@ -69,6 +70,7 @@
 						<li 
 							class="net-choice"
 							:class="{ activeChoice: chainId== 5 }"
+							@click="switchNet(5)"
 						>
 							<i class="fa-brands fa-ethereum"></i>
 							<span>Goerli</span>
@@ -101,7 +103,7 @@
             <p>實地造訪你鑄造成功的NFT景點，打卡與拍照，我請你喝一杯在地新鮮果汁店的果汁。</p>
             <p>總發行量：100，已發行：{{ contractSupplyCounter }}</p>
             <h3>我要參加：</h3>
-            <p>請連接小狐狸錢包，並使用Goerli測試網進行鑄造，成功後可至OpenSea測試網查詢你的NFT<a target="blank" href="https://testnets.opensea.io/zh-TW">OpenSea測試網路</a></p>
+            <p>連接小狐狸錢包，Goerli測試網進行鑄造，成功後可至OpenSea測試網查看您的NFT<a target="blank" href="https://testnets.opensea.io/zh-TW">OpenSea測試網路</a></p>
         </div>
         <div class="main-area">
             <div class="nft-showcase">
@@ -134,7 +136,11 @@
             :class="{ showModal: showModal }"
         >
             <div class="modal-title">
-                <h4> {{modalMessage.title}} </h4>
+                <h4
+					:style="mintStatusColor"
+				> 
+				{{modalMessage.title}} 
+				</h4>
                 <span 
                     class="close-modal"
                     @click="showModal = false"
@@ -161,6 +167,9 @@
         el: '#app',
 
         data: {
+				mintStatusColor:{
+					color:''
+				},
 				chainId:0,
 				toggleNetList:false,
                 ownerAddress: "0xfeeDDaD9C1311FA5dC5d35C99aB852154a314e80",
@@ -579,25 +588,38 @@
                 // 地址短寫處理
                 this.connectStatus = userAccount.slice(0, 5) + "..." + userAccount.slice(userAccount.length - 4, userAccount.length);
 
-                // 取mint次數, 每人只可以mint兩次
-                this.addressMintCounter = await this.myContract.methods.balanceOf(this.coinbase).call(); 
-                this.isConnected = true;
+				// 取chainId
+				this.getChainId();
 
             },
 
-            getContract: async function(){
-                // 取得合約
-                this.myContract = new web3.eth.Contract(this.contractABI, this.contractAddress);
+			getMintTimes: async function(){
+                // 取mint次數, 每人只可以mint兩次
+                this.addressMintCounter = await this.myContract.methods.balanceOf(this.coinbase).call()
+			},
 
-                // 取合nft的數量, 限制一百個
-                this.contractSupplyCounter = await this.myContract.methods.getTotalSupply().call(); 
+            getContract: async function(){
+
+				// 取得合約
+				this.myContract = new web3.eth.Contract(this.contractABI, this.contractAddress);
+				// 取合nft的數量, 限制一百個
+				this.contractSupplyCounter = await this.myContract.methods.getTotalSupply().call();
+				this.isConnected = true;
 
             },
 
             // 確認mint資格
             mintCheck: async function(){
 
-                if(!this.isConnected){
+				// 如果不是Goerli網路
+				if(this.chainId !==5){
+					this.showModal = true;
+                    this.modalMessage.title = "失敗failed"
+                    this.modalMessage.content = "請切換至Goerli網"
+                    return;
+				}
+
+				if(!this.isConnected){
                     this.showModal = true;
                     this.modalMessage.title = "失敗failed"
                     this.modalMessage.content = "請連結錢包/please connect wallet."
@@ -618,26 +640,29 @@
 
             mint: async function(){
 
-                this.modalMessage.title = "鑄造中mint..."
+                this.modalMessage.title = "鑄造中minting..."
                 this.modalMessage.content = "請稍候... please wait..."
                 this.showModal = true;
-
-                setTimeout(()=>{
-                    this.showModal = false;
-                }, 15000)
+				this.mintStatusColor.color = '';
 
                 this.myContract.methods.mint().send({from: this.coinbase, value:"0"}).then(async(receipt)=>{
                     // 回傳挖礦成功資料
                     console.log('receipt', receipt);
+					this.mintStatusColor.color = 'green';
 
                     this.showModal = true;
                     this.modalMessage.title = "成功/success"
-                    this.modalMessage.content = "請前往 OpenSea測試網查看NFT, please check NFT in OpenSea"
+                    this.modalMessage.content = "請前往 OpenSea測試網查看NFT：https://testnets.opensea.io/zh-TW/account"
 
                     // 更新nft數量, 更新user資料
                     this.printUserInfo();
-                    this.getContract();
-                })
+
+					
+                }).catch((err)=>{
+					this.modalMessage.title = "失敗/error"
+                    this.modalMessage.content = "Please try again."
+					this.mintStatusColor.color = 'red';
+				})
                 
 
             },
@@ -645,23 +670,38 @@
 			// 切net
 			switchNet: async function(targetId){
 
-				// const targetChainId = 1;
+				if(targetId == this.chainId){
+					this.toggleNetList = false;
+					return
+				}
+
 				if (window.ethereum) {
 					try {
 							await window.ethereum.request({
 								method: 'wallet_switchEthereumChain',
 								params: [{ chainId: Web3.utils.toHex(targetId) }],
 							});
+
+							await this.printUserInfo();
 						}
 					catch(err){
-						console.log(err,'err')
+						console.log('err info', err)
 					}
-			}},
+				}
 
-			// get chain Id
-			getChainId: async function(){
+				this.toggleNetList = false;
+			},
+
+			// get chain Id and contract data.
+			getChainId: function(){
 				web3.eth.net.getId().then((id)=>{
 						this.chainId = id;
+
+						// Goerli才要取合約
+						if(id == 5){
+							this.getContract();
+							this.getMintTimes();
+						}
 				})
 			},
 
@@ -679,10 +719,6 @@
                 }
             });
 
-            // 取得合約
-            this.getContract();
-
-			this.getChainId();
         }
     
     })
