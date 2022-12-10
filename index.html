@@ -28,11 +28,61 @@
                 <span>${{ balance}}</span>
             </div>
 
+			<button
+				class="net-btn"
+			>
+				{{ chainName }}
+
+				<svg 
+					fill="none" 
+					height="7" 
+					width="14" 
+					xmlns="http://www.w3.org/2000/svg"
+					class="toggle-arrow"
+					@click="toggleSwiftList" 
+				>
+					<path 
+						d="M12.75 1.54001L8.51647 5.0038C7.77974 5.60658 6.72026 5.60658 5.98352 5.0038L1.75 1.54001" 
+						stroke="currentColor" 
+						stroke-linecap="round" 
+						stroke-linejoin="round" 
+						stroke-width="2.5" 
+						xmlns="http://www.w3.org/2000/svg">
+					</path>
+				</svg>
+
+				<div 
+					class="swift-box"
+					v-if="toggleNetList"
+				>
+					<span>Switch Networks</span>
+
+					<ul class="swift-list">
+						<li 
+							class="net-choice"
+							:class="{ activeChoice: chainId== 1 }"
+						>
+							<i class="fa-brands fa-ethereum"></i>
+							<span>Ethereum</span>
+						</li>
+
+						<li 
+							class="net-choice"
+							:class="{ activeChoice: chainId== 5 }"
+						>
+							<i class="fa-brands fa-ethereum"></i>
+							<span>Goerli</span>
+						</li>
+					</ul>
+
+				</div>
+			</button>
+
             <button
                 class="connect-btn"
                 @click="connect"
             >
-            {{ connectStatus }}
+            	{{ connectStatus }}
             </button>
         </div>
         <div class="play-area">
@@ -111,6 +161,8 @@
         el: '#app',
 
         data: {
+				chainId:0,
+				toggleNetList:false,
                 ownerAddress: "0xfeeDDaD9C1311FA5dC5d35C99aB852154a314e80",
                 contractAddress: "0x20C5AA627e50B97B9011e1692ADA950278fF5C2B",
                 connectStatus:'connect wallet',
@@ -486,6 +538,22 @@
                 ]
         },
 
+		computed:{
+
+			chainName(){
+
+				if(this.chainId == 1){
+					return "Ethereum";
+				}
+
+				if(this.chainId == 5){
+					return "Goerli";
+				}
+
+				return "Wrong Net"
+			},
+		},
+
         methods: {
             connect: async function(){
                 if (window.ethereum) {
@@ -574,7 +642,33 @@
 
             },
 
-        },
+			// 切net
+			switchNet: async function(targetId){
+
+				// const targetChainId = 1;
+				if (window.ethereum) {
+					try {
+							await window.ethereum.request({
+								method: 'wallet_switchEthereumChain',
+								params: [{ chainId: Web3.utils.toHex(targetId) }],
+							});
+						}
+					catch(err){
+						console.log(err,'err')
+					}
+			}},
+
+			// get chain Id
+			getChainId: async function(){
+				web3.eth.net.getId().then((id)=>{
+						this.chainId = id;
+				})
+			},
+
+			toggleSwiftList(){
+				this.toggleNetList = !this.toggleNetList;
+			},
+		},
 
         created(){
 
@@ -588,6 +682,7 @@
             // 取得合約
             this.getContract();
 
+			this.getChainId();
         }
     
     })
